@@ -1,3 +1,0 @@
-/home/zhaomr/workdir/cepc/Tracking/000test/lib/libmymarlin.so.0.1.0
-/home/zhaomr/workdir/cepc/Tracking/000test/lib/libmymarlin.so.0.1
-/home/zhaomr/workdir/cepc/Tracking/000test/lib/libmymarlin.so
