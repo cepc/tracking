@@ -33,3 +33,7 @@
 
 # Data
 data
+*.root
+
+# Build files
+build
