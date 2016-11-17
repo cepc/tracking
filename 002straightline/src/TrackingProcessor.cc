@@ -8,6 +8,9 @@
 #include <EVENT/LCFloatVec.h>
 #include <EVENT/LCParameters.h>
 
+#include <TFile.h>
+#include <TTree.h>
+
 #include <iostream>
 #include <string>
 using std::string;
@@ -35,7 +38,7 @@ void TrackingProcessor::init()
 
     if (_outputFileName != "")
     {
-        _output = new TFile(_outputFileName, "recreate");
+        _output = new TFile(_outputFileName.c_str(), "recreate");
     }
     else
     {
@@ -48,25 +51,26 @@ void TrackingProcessor::init()
 	// printParameters();
 }
 
-void initTree()
+void TrackingProcessor::initTree()
 {
     _tree = new TTree("tracksTree", "Tracks Parameters");
-    _tree->Branch("MarlinTrack_d0"        , &MarlinTrack_d0        , "MarlinTrack_d0/D");
-    _tree->Branch("MarlinTrack_phi"       , &MarlinTrack_phi       , "MarlinTrack_phi/D");
-    _tree->Branch("MarlinTrack_omega"     , &MarlinTrack_omega     , "MarlinTrack_omega/D");
-    _tree->Branch("MarlinTrack_z0"        , &MarlinTrack_z0        , "MarlinTrack_z0/D");
-    _tree->Branch("MarlinTrack_tanLambda" , &MarlinTrack_tanLambda , "MarlinTrack_tanLambda/D");
-    _tree->Branch("MarlinTrack_d0"        , &MarlinTrack_d0        , "MarlinTrack_d0");
-    _tree->Branch("SiTrack_phi"       , &SiTrack_phi       , "SiTrack_phi");
-    _tree->Branch("SiTrack_omega"     , &SiTrack_omega     , "SiTrack_omega");
-    _tree->Branch("SiTrack_z0"        , &SiTrack_z0        , "SiTrack_z0");
-    _tree->Branch("SiTrack_tanLambda" , &SiTrack_tanLambda , "SiTrack_tanLambda");
-    _tree->Branch("CluptraTrack_d0"        , &CluptraTrack_d0        , "CluptraTrack_d0");
-    _tree->Branch("CluptraTrack_phi"       , &CluptraTrack_phi       , "CluptraTrack_phi");
-    _tree->Branch("CluptraTrack_omega"     , &CluptraTrack_omega     , "CluptraTrack_omega");
-    _tree->Branch("CluptraTrack_z0"        , &CluptraTrack_z0        , "CluptraTrack_z0");
-    _tree->Branch("CluptraTrack_tanLambda" , &CluptraTrack_tanLambda , "CluptraTrack_tanLambda");
+    _tree->Branch("marlinTrack_d0"        , &marlinTrack_d0        , "marlinTrack_d0/D");
+    _tree->Branch("marlinTrack_phi"       , &marlinTrack_phi       , "marlinTrack_phi/D");
+    _tree->Branch("marlinTrack_omega"     , &marlinTrack_omega     , "marlinTrack_omega/D");
+    _tree->Branch("marlinTrack_z0"        , &marlinTrack_z0        , "marlinTrack_z0/D");
+    _tree->Branch("marlinTrack_tanLambda" , &marlinTrack_tanLambda , "marlinTrack_tanLambda/D");
+    _tree->Branch("siTrack_d0"        , &siTrack_d0        , "siTrack_d0/D");
+    _tree->Branch("siTrack_phi"       , &siTrack_phi       , "siTrack_phi/D");
+    _tree->Branch("siTrack_omega"     , &siTrack_omega     , "siTrack_omega/D");
+    _tree->Branch("siTrack_z0"        , &siTrack_z0        , "siTrack_z0/D");
+    _tree->Branch("siTrack_tanLambda" , &siTrack_tanLambda , "siTrack_tanLambda/D");
+    _tree->Branch("cluptraTrack_d0"        , &cluptraTrack_d0        , "cluptraTrack_d0/D");
+    _tree->Branch("cluptraTrack_phi"       , &cluptraTrack_phi       , "cluptraTrack_phi/D");
+    _tree->Branch("cluptraTrack_omega"     , &cluptraTrack_omega     , "cluptraTrack_omega/D");
+    _tree->Branch("cluptraTrack_z0"        , &cluptraTrack_z0        , "cluptraTrack_z0/D");
+    _tree->Branch("cluptraTrack_tanLambda" , &cluptraTrack_tanLambda , "cluptraTrack_tanLambda/D");
 }
+
 
 void TrackingProcessor::processEvent( LCEvent * evtP )
 {
@@ -77,16 +81,22 @@ void TrackingProcessor::processEvent( LCEvent * evtP )
 		return;
 	}
 
-
 	// Process clupatra
 	processClupatraTracks( evtP );
     processSiTracks( evtP );
     processMarlinTracks( evtP );
+    _tree->Fill();
 	//processTrackingHits( evtP );
+
+    streamlog_out(MESSAGE) << "\033[32m Successfully  \033[0m" << endl;
 }
 
 void TrackingProcessor::end()
 {
+    _tree->Write();
+    delete _tree;
+    _output->Close();
+    delete _output;
     streamlog_out(MESSAGE) << "\033[31m Tracking Processor Stop \033[0m" << endl;
 }
 
@@ -97,15 +107,24 @@ void TrackingProcessor::processClupatraTracks( LCEvent * evtP )
 	LCCollection* clupatraTracksCollection = evtP->getCollection("ClupatraTracks");
 	int numberOfElements = clupatraTracksCollection->getNumberOfElements();
 
+    if (numberOfElements == 0)
+    {
+        cluptraTrack_d0        = -10000;
+        cluptraTrack_phi       = -10000;
+        cluptraTrack_omega     = -10000;
+        cluptraTrack_z0        = -10000;
+        cluptraTrack_tanLambda = -10000;
+    }
+
 	for (int index = 0; index < numberOfElements; index++)
 	{
 		Track* clupatraTrack = dynamic_cast<Track*>( clupatraTracksCollection->getElementAt(index) );
-		double d0        = clupatraTrack->getD0();
-		double phi       = clupatraTrack->getPhi();
-		double omega     = clupatraTrack->getOmega();
-		double z0        = clupatraTrack->getZ0();
-		double tanLambda = clupatraTrack->getTanLambda();
-        streamlog_out(MESSAGE) << "d0 = " << d0 << " phi = " << phi << " omega = " << omega << " z0 = " << z0 << " tanLambda = " << tanLambda << endl;
+		cluptraTrack_d0        = clupatraTrack->getD0();
+		cluptraTrack_phi       = clupatraTrack->getPhi();
+		cluptraTrack_omega     = clupatraTrack->getOmega();
+		cluptraTrack_z0        = clupatraTrack->getZ0();
+		cluptraTrack_tanLambda = clupatraTrack->getTanLambda();
+
 	}
 }
 
@@ -114,21 +133,26 @@ void TrackingProcessor::processSiTracks( LCEvent * evtP )
     streamlog_out(MESSAGE) << "\033[31m processing Silicon Tracks \033[0m" << endl;
 	// Get Collection of siTracksCollection
 	LCCollection* siTracksCollection = evtP->getCollection("SiTracks");
-    if (siTracksCollection == 0) return;
 	int numberOfElements = siTracksCollection->getNumberOfElements();
+
+    if (numberOfElements == 0)
+    {
+        siTrack_d0        = -10000;
+        siTrack_phi       = -10000;
+        siTrack_omega     = -10000;
+        siTrack_z0        = -10000;
+        siTrack_tanLambda = -10000;
+    }
 
 	for (int index = 0; index < numberOfElements; index++)
 	{
 		Track* siTrack = dynamic_cast<Track*>( siTracksCollection->getElementAt(index) );
-		double d0        = siTrack->getD0();
-		double phi       = siTrack->getPhi();
-		double omega     = siTrack->getOmega();
-		double z0        = siTrack->getZ0();
-		double tanLambda = siTrack->getTanLambda();
-        streamlog_out(MESSAGE) << "d0 = " << d0 << " phi = " << phi << " omega = " << omega << " z0 = " << z0 << " tanLambda = " << tanLambda << endl;
-		//streamlog_out(MESSAGE) << "d0 = " << d0 << " phi = " << phi << " omega = " << omega << " z0 = " << z0 << " tanLambda = " << tanLambda << endl;
-        //StraightLine line(phi, d0, omega, z0, tanLambda);
-        //streamlog_out(MESSAGE) << line.omega << endl;
+		siTrack_d0        = siTrack->getD0();
+		siTrack_phi       = siTrack->getPhi();
+		siTrack_omega     = siTrack->getOmega();
+		siTrack_z0        = siTrack->getZ0();
+		siTrack_tanLambda = siTrack->getTanLambda();
+
 	}
 }
 
@@ -138,15 +162,24 @@ void TrackingProcessor::processMarlinTracks( LCEvent * evtP )
     LCCollection* marlinTracksCollection = evtP->getCollection("MarlinTrkTracks");
     int numberOfElements = marlinTracksCollection->getNumberOfElements();
 
+    if (numberOfElements == 0)
+    {
+        marlinTrack_d0        = -10000;
+        marlinTrack_phi       = -10000;
+        marlinTrack_omega     = -10000;
+        marlinTrack_z0        = -10000;
+        marlinTrack_tanLambda = -10000;
+    }
+
     for (int index = 0; index < numberOfElements; index++)
     {
         Track* marlinTrack = dynamic_cast<Track*>( marlinTracksCollection->getElementAt(index) );
-		double d0        = marlinTrack->getD0();
-		double phi       = marlinTrack->getPhi();
-		double omega     = marlinTrack->getOmega();
-		double z0        = marlinTrack->getZ0();
-		double tanLambda = marlinTrack->getTanLambda();
-        streamlog_out(MESSAGE) << "d0 = " << d0 << " phi = " << phi << " omega = " << omega << " z0 = " << z0 << " tanLambda = " << tanLambda << endl;
+		marlinTrack_d0        = marlinTrack->getD0();
+		marlinTrack_phi       = marlinTrack->getPhi();
+		marlinTrack_omega     = marlinTrack->getOmega();
+		marlinTrack_z0        = marlinTrack->getZ0();
+		marlinTrack_tanLambda = marlinTrack->getTanLambda();
+
     }
 }
 
