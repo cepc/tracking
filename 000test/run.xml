@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!-- ?xml-stylesheet type="text/xsl" href="http://ilcsoft.desy.de/marlin/marlin.xsl"? -->
+<!-- ?xml-stylesheet type="text/xsl" href="marlin.xsl"? -->
+
+<!-- Loading shared library : /afs/ihep.ac.cn/users/z/zhaomr/workdir/Tracking/001initial/lib/libTrackingProcessor.so.0.0.0 (libTrackingProcessor.so)-->
+
+<!--##########################################
+    #                                        #
+    #     Example steering file for marlin   #
+    #                                        #
+    ##########################################-->
+
+
+<marlin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ilcsoft.desy.de/marlin/marlin.xsd">
+ <execute>
+ <processor name="myTrackingProcessor"/>
+ </execute>
+
+ <global>
+  <parameter name="LCIOInputFiles"> /afs/ihep.ac.cn/users/z/zhaomr/workdir/Tracking/data/mu-_R_1843_100GeV.slcio </parameter>
+  <!--<parameter name="LCIOInputFiles"> /besfs/groups/higgs/users/yuanxq/MG_emu/bin/ee_zh_zmutau/hep2reco/Recodata1/MG_rec.001.slcio </parameter>-->
+
+  <!-- limit the number of processed records (run+evt): -->
+  <parameter name="MaxRecordNumber" value=5 />
+  <parameter name="SkipNEvents" value="0" />
+  <parameter name="SupressCheck" value="false" />
+  <!--<parameter name="GearXMLFile" value="/besfs/groups/higgs/data/SimReco/wo_BS/run/GearOutput.xml"/>-->
+  <parameter name="GearXMLFile"> /afs/ihep.ac.cn/users/z/zhaomr/workdir/Tracking/data/Gear_Files/GearOutput.xml </parameter>
+  <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> MESSAGE  </parameter>
+  <parameter name="RandomSeed" value="1234567890" />
+  <!-- optionally limit the collections that are read from the input file: -->
+  <!--parameter name="LCIOReadCollectionNames">MCParticle PandoraPFOs</parameter-->
+ </global>
+
+ <processor name="myTrackingProcessor" type="TrackingProcessor">
+  <parameter name="good" type="int">0 </parameter>
+ <!--Processor that handles AIDA files. Creates on directory per processor.  Processors only need to create and fill the histograms, clouds and tuples. Needs to be the first ActiveProcessor-->
+  <!-- compression of output file 0: false >0: true (default) -->
+  <!-- filename without extension-->
+  <!-- type of output file root (default) or xml )-->
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
+</processor>
+
+</marlin>
