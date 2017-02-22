@@ -46,6 +46,10 @@ class TrackingProcessor  : public marlin::Processor
         double cluptraTrack_z0;
         double cluptraTrack_tanLambda;
 
+        int has_marlinTrack;
+        int has_siTrack;
+        int has_cluptraTrack;
+
         TTree* _tree;
         TFile* _output;
         string _outputFileName;

@@ -69,6 +69,9 @@ void TrackingProcessor::initTree()
     _tree->Branch("cluptraTrack_omega"     , &cluptraTrack_omega     , "cluptraTrack_omega/D");
     _tree->Branch("cluptraTrack_z0"        , &cluptraTrack_z0        , "cluptraTrack_z0/D");
     _tree->Branch("cluptraTrack_tanLambda" , &cluptraTrack_tanLambda , "cluptraTrack_tanLambda/D");
+    _tree->Branch("has_marlinTrack"   , &has_marlinTrack,   "has_marlinTrack/I");
+    _tree->Branch("has_siTrack"       , &has_siTrack,       "has_siTrack/I");
+    _tree->Branch("has_cluptraTrack"  , &has_cluptraTrack,  "has_cluptraTrack/I");
 }
 
 
@@ -107,6 +110,7 @@ void TrackingProcessor::processClupatraTracks( LCEvent * evtP )
 	LCCollection* clupatraTracksCollection = evtP->getCollection("ClupatraTracks");
 	int numberOfElements = clupatraTracksCollection->getNumberOfElements();
 
+    has_cluptraTrack = 1;
     if (numberOfElements == 0)
     {
         cluptraTrack_d0        = -10000;
@@ -114,6 +118,7 @@ void TrackingProcessor::processClupatraTracks( LCEvent * evtP )
         cluptraTrack_omega     = -10000;
         cluptraTrack_z0        = -10000;
         cluptraTrack_tanLambda = -10000;
+        has_cluptraTrack = 0;
     }
 
 	for (int index = 0; index < numberOfElements; index++)
@@ -135,6 +140,7 @@ void TrackingProcessor::processSiTracks( LCEvent * evtP )
 	LCCollection* siTracksCollection = evtP->getCollection("SiTracks");
 	int numberOfElements = siTracksCollection->getNumberOfElements();
 
+    has_siTrack = 1;
     if (numberOfElements == 0)
     {
         siTrack_d0        = -10000;
@@ -142,6 +148,7 @@ void TrackingProcessor::processSiTracks( LCEvent * evtP )
         siTrack_omega     = -10000;
         siTrack_z0        = -10000;
         siTrack_tanLambda = -10000;
+        has_siTrack = 0;
     }
 
 	for (int index = 0; index < numberOfElements; index++)
@@ -162,6 +169,7 @@ void TrackingProcessor::processMarlinTracks( LCEvent * evtP )
     LCCollection* marlinTracksCollection = evtP->getCollection("MarlinTrkTracks");
     int numberOfElements = marlinTracksCollection->getNumberOfElements();
 
+    has_marlinTrack = 1;
     if (numberOfElements == 0)
     {
         marlinTrack_d0        = -10000;
@@ -169,6 +177,7 @@ void TrackingProcessor::processMarlinTracks( LCEvent * evtP )
         marlinTrack_omega     = -10000;
         marlinTrack_z0        = -10000;
         marlinTrack_tanLambda = -10000;
+        has_marlinTrack = 0;
     }
 
     for (int index = 0; index < numberOfElements; index++)

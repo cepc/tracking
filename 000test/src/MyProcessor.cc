@@ -30,16 +30,16 @@ MyProcessor::MyProcessor() : Processor("MyProcessor") {
 
     // register steering parameters: name, description, class-variable, default value
     registerInputCollection( LCIO::MCPARTICLE,
-            "CollectionName" , 
+            "CollectionName" ,
             "Name of the MCParticle collection"  ,
             _colName ,
             std::string("MCParticle")
-    );
+            );
 }
 
 
 
-void MyProcessor::init() { 
+void MyProcessor::init() {
 
     streamlog_out(DEBUG) << "   init called  " << std::endl ;
 
@@ -52,29 +52,29 @@ void MyProcessor::init() {
 }
 
 
-void MyProcessor::processRunHeader( LCRunHeader* run) { 
+void MyProcessor::processRunHeader( LCRunHeader* run) {
 
     _nRun++ ;
-} 
+}
 
 
 
-void MyProcessor::processEvent( LCEvent * evt ) { 
+void MyProcessor::processEvent( LCEvent * evt ) {
 
 
-    // this gets called for every event 
+    // this gets called for every event
     // usually the working horse ...
 
 
 #ifdef MARLIN_USE_AIDA
 
     // define a histogram pointer
-    static AIDA::ICloud1D* hMCPEnergy ;    
+    static AIDA::ICloud1D* hMCPEnergy ;
 
-    if( isFirstEvent() ) { 
+    if( isFirstEvent() ) {
 
         hMCPEnergy = AIDAProcessor::histogramFactory(this)->
-            createCloud1D( "hMCPEnergy", "energy of the MCParticles", 100 ) ; 
+            createCloud1D( "hMCPEnergy", "energy of the MCParticles", 100 ) ;
 
     }
 #endif // MARLIN_USE_AIDA
@@ -101,26 +101,26 @@ void MyProcessor::processEvent( LCEvent * evt ) {
     //}
 
     // this will only be entered if the collection is available
-    if( col != NULL ){
+    if( col != NULL ) {
 
         int nMCP = col->getNumberOfElements()  ;
 
-        for(int i=0; i< nMCP ; i++){
+        for(int i=0; i< nMCP ; i++) {
 
-            MCParticle* p = dynamic_cast<MCParticle*>( col->getElementAt( i ) ) ;
+            MCParticle* p = dynamic_cast<MCParticle*>( col->getElementAt(i) ) ;
 
 #ifdef MARLIN_USE_AIDA
             // fill histogram from LCIO data :
             hMCPEnergy->fill( p->getEnergy() ) ;
 #endif
-        } 
+        }
     }
 
 
 
     //-- note: this will not be printed if compiled w/o MARLINDEBUG=1 !
 
-    streamlog_out(DEBUG) << "   processing event: " << evt->getEventNumber() 
+    streamlog_out(DEBUG) << "   processing event: " << evt->getEventNumber()
         << "   in run:  " << evt->getRunNumber() << std::endl ;
 
 
@@ -130,14 +130,14 @@ void MyProcessor::processEvent( LCEvent * evt ) {
 
 
 
-void MyProcessor::check( LCEvent * evt ) { 
+void MyProcessor::check( LCEvent * evt ) {
     // nothing to check here - could be used to fill checkplots in reconstruction processor
 }
 
 
-void MyProcessor::end(){ 
+void MyProcessor::end(){
 
-    //   std::cout << "MyProcessor::end()  " << name() 
+    //   std::cout << "MyProcessor::end()  " << name()
     // 	    << " processed " << _nEvt << " events in " << _nRun << " runs "
     // 	    << std::endl ;
 
